@@ -5,7 +5,7 @@ class onShowTrips(Resource):
         print("onShowTrips")
 
 class onJoinTrip(Resource):
-    def post(self):
+    def post(self, trip_id, user_id):
         print("onJoinTrip")
 
 class onEditTrip(Resource):

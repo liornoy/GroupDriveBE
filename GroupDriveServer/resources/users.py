@@ -1,4 +1,4 @@
-from flask_restful import Resource
+from flask import Resource, request
 
 class onLogin(Resource):
     def post(self):

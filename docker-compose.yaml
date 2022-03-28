@@ -1,7 +1,20 @@
 version: "3.8"
 services:
+  flask:
+      build:
+        context: GroupDriveServer
+        dockerfile: Dockerfile
+      container_name: flask
+      image: groupdrive-server
+      restart: unless-stopped
+      depends_on:
+        - mongodb
+
   mongodb:
-    image : mongo
+    build:
+        context: mongodb
+        dockerfile: Dockerfile
+    image : groupdrive-mongo
     container_name: mongodb
     environment:
     - PUID=1000
