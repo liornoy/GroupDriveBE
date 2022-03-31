@@ -1,12 +1,21 @@
-from .users import onLogin, onEditUser, onShowUsers
-from .trips import onEditTrip, onShowTrips, onJoinTrip
+from users import UserApi, UsersApi
+from trips import TripApi, TripsApi
+from events import JoinTripEvent
+
 
 def initialize_routes(api):
+
     # Users API
-    api.add_resource(onLogin, '/api/users/login')
-    api.add_resource(onEditUser, '/api/users/<user_id>/edit')
-    api.add_resource(onShowUsers, '/api/users')
+
+    api.add_resource(UsersApi, '/api/users')
+    api.add_resource(UserApi, '/api/users/<id>')
+
     # Trips API
-    api.add_resource(onShowTrips, '/api/trips')
-    api.add_resource(onJoinTrip, '/api/trips/<trip_id>/join/<user_id>')
-    api.add_resource(onEditTrip, '/api/trips/<trip_id>/edit')
+
+    api.add_resource(TripsApi, '/api/trips')
+    api.add_resource(TripApi, '/api/trips/<id>')
+
+    # Events API
+
+    api.add_resource(JoinTripEvent,
+                     '/api/events/jointrip/<user_id>/<trip_id>')

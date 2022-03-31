@@ -1,20 +1,28 @@
-from .db import db
+from mongoengine import Document
+from mongoengine.fields import StringField, ReferenceField, ListField, \
+    FloatField, DateTimeField, BooleanField
 
-class User(db.Document):
-    photoURL = db.StringField()
-    name = db.StringField(required=True)
 
-class Trip(db.Document):
-    creator = db.ReferenceField('User')
-    meetingPoint = db.StringField(required=True)
-    meetingPointWazeUrl= db.StringField(required=True)
-    description= db.StringField(required=True)
-    date= db.DateTimeField(required=True)
-    isTripToday=db.BooleanField(required=True, default=False)
+class User(Document):
 
-class UserLiveGPSCoordinate(db.Document):
-    user = db.ReferenceField('User')
-    trip = db.ReferenceField('Trip')
-    longitude = db.FloatField(required=True)
-    latitude = db.FloatField(required=True)
-    
+    photoURL = StringField()
+    name = StringField(required=True)
+
+
+class Trip(Document):
+
+    creator = ReferenceField('User')
+    meetingPoint = StringField(required=True)
+    meetingPointWazeUrl = StringField(required=True)
+    description = StringField(required=True)
+    participants = ListField(ReferenceField('User'))
+    date = DateTimeField(required=True)
+    isTripToday = BooleanField(required=True, default=False)
+
+
+class UserLiveGPSCoordinate(Document):
+
+    user = ReferenceField('User')
+    trip = ReferenceField('Trip')
+    longitude = FloatField(required=True)
+    latitude = FloatField(required=True)
