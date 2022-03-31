@@ -15,6 +15,8 @@ errors = {
                           'status': 401},
     'UserNotExistsError': {'message': "User with given id doesn't exists",
                            'status': 400},
+    'UpdatingUserError': {'message': 'Updating other user is forbidden',
+                          'status': 403},
     'BadTokenError': {'message': 'Invalid token', 'status': 403},
     'ExpiredTokenError': {'message': 'Expired token', 'status': 403},
     }
@@ -59,6 +61,10 @@ class UserNotExistsError(Exception):
 
     pass
 
+
+class UpdatingUserError(Exception):
+
+    pass
 
 class BadTokenError(Exception):
 

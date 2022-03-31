@@ -16,12 +16,6 @@ class UserApi(Resource):
         user.save()
         return Response(status=200)
 
-    def delete(self, id):
-        user = User.objects().get(id=id)
-        user.delete()
-        return Response(status=200)
-
-
 class UsersApi(Resource):
 
     def get(self):
