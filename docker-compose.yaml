@@ -11,16 +11,14 @@ services:
         - mongodb
 
   mongodb:
-    build:
-        context: mongodb
-        dockerfile: Dockerfile
-    image : groupdrive-mongo
+    image: mongo
     container_name: mongodb
-    environment:
-    - PUID=1000
-    - PGID=1000
     volumes:
-    - './mongodb/database:/data/db'
+    - dbdata:/data/db
     ports:
     - 27017:27017
     restart: unless-stopped
+
+volumes:
+  dbdata:
+    driver: local
