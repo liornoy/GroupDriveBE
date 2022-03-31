@@ -1,24 +1,24 @@
 version: "3.8"
 services:
   flask:
-      build:
-        context: GroupDriveServer
-        dockerfile: Dockerfile
-      container_name: flask
-      image: groupdrive-server
-      restart: unless-stopped
-      depends_on:
-        - mongodb
-
+    build:
+      context: GroupDriveServer
+      dockerfile: Dockerfile
+    container_name: flask
+    image: groupdrive-server
+    ports:
+      - 5000:5000
+    restart: unless-stopped
+    depends_on:
+      - mongodb
   mongodb:
     image: mongo
     container_name: mongodb
     volumes:
-    - dbdata:/data/db
+      - dbdata:/data/db
     ports:
-    - 27017:27017
+      - 27017:27017
     restart: unless-stopped
-
 volumes:
   dbdata:
     driver: local
