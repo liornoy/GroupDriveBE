@@ -1,6 +1,6 @@
 from flask_restful import Resource
 from flask import Response
-from database.models import Trip, User, UserInTrip
+from database.models import Trip, User
 from mongoengine.errors import DoesNotExist
 from resources.errors import UserNotExistsError, TripNotExistsError
 
@@ -18,9 +18,6 @@ class JoinTripEvent(Resource):
         except DoesNotExist:
             raise TripNotExistsError
 
-        userInTrip = UserInTrip()
-        userInTrip.user = user
-        userInTrip.trip = trip
-        userInTrip.save()
-        return Response(userInTrip.get('_id'),
-                        mimetype='application/json', status=200)
+        trip.participants.append(user)
+        trip.save()
+        return Response(status=200)

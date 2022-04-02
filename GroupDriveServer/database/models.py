@@ -1,7 +1,7 @@
 from mongoengine import Document
 from mongoengine.fields import StringField, ReferenceField, ListField, \
     FloatField, DateTimeField, BooleanField
-
+from datetime import datetime as dt
 
 class User(Document):
 
@@ -16,8 +16,13 @@ class Trip(Document):
     meetingPointWazeUrl = StringField(required=True)
     description = StringField(required=True)
     participants = ListField(ReferenceField('User'))
-    date = DateTimeField(required=True)
+    dateTime = DateTimeField(required=True)
     isTripToday = BooleanField(required=True, default=False)
+
+    def updateTrip(self):
+        if self.dateTime.date() == dt.today().date():
+                self.isTripToday = True
+                self.save()
 
 
 class UserLiveGPSCoordinate(Document):
