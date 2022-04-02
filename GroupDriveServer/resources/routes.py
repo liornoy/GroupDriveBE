@@ -1,6 +1,6 @@
-from users import UserApi, UsersApi
-from trips import TripApi, TripsApi
-from events import JoinTripEvent
+from .users import UserApi, UsersApi
+from .trips import TripApi, TripsApi
+from .events import JoinTripEvent
 
 
 def initialize_routes(api):
