@@ -4,20 +4,22 @@ from resources.routes import initialize_routes
 from database.db import initialize_db
 from flask_jwt_extended import JWTManager
 
-app = Flask('__name__')
 
-app.config.from_envvar('ENV_FILE_LOCATION')
-app.debug = True
+def create_app(configFileName):
+    app = Flask("__name__")
 
-api = Api(app)
-jwt = JWTManager(app)
+    app.config.from_pyfile(configFileName)
+    app.debug = True
 
-# Init our database.
+    api = Api(app)
+    jwt = JWTManager(app)
 
-initialize_db(app)
+    # Init our database.
 
-# Define the routes of the server.
+    initialize_db(app)
 
-initialize_routes(api)
+    # Define the routes of the server.
 
-app.run(debug=True)
+    initialize_routes(api)
+
+    return app
