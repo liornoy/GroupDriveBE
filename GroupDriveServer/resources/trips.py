@@ -7,9 +7,10 @@ from resources.errors import TripNotExistsError
 
 class TripApi(Resource):
 
-    def get(self, id):
+    def get(self, trip_id):
         try:
-            trip = Trip.objects()(id= id).first()
+            trip = Trip.objects().get(id=trip_id)
+            # Updating the field isTripToday
             trip.updateTrip()
             return Response(trip.to_json(), mimetype = 'application/json', status=200)
         except DoesNotExist:
@@ -17,10 +18,10 @@ class TripApi(Resource):
         
         
 
-    def put(self, id):
+    def put(self, trip_id):
         try:
             body = request.get_json(force=True)
-            trip = Trip.objects().get(id=id)
+            trip = Trip.objects().get(id=trip_id)
             trip.update(**body)
             trip.save()
             return Response(status=200) 
@@ -28,9 +29,9 @@ class TripApi(Resource):
             raise TripNotExistsError
         
 
-    def delete(self, id):
+    def delete(self, trip_id):
         try:
-            trip = Trip.objects().get(id=id)
+            trip = Trip.objects().get(id=trip_id)
             trip.delete()
             return Response(status=200)
         except DoesNotExist:
