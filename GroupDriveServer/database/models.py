@@ -24,6 +24,13 @@ class Trip(Document):
                 self.isTripToday = True
                 self.save()
 
+    def isUserJoined(self, user):
+        for p in self.participants:
+            if p.googleID == user.googleID:
+                return True
+        return False
+
+
 
 class UserLiveGPSCoordinates(Document):
 
@@ -31,3 +38,9 @@ class UserLiveGPSCoordinates(Document):
     trip = ReferenceField('Trip')
     longitude = FloatField(required=True)
     latitude = FloatField(required=True)
+
+    def isValid(self, user_id):
+        auth = self.user.googleID == user_id
+        joinedTrip = self.trip.isUserJoined(self.user)
+        isTripToday = self.trip.isTripToday
+        return auth and joinedTrip and isTripToday
