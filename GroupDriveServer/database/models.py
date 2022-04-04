@@ -1,7 +1,15 @@
 from mongoengine import Document
-from mongoengine.fields import StringField, ReferenceField, ListField, \
-    FloatField, DateTimeField, BooleanField, DictField
+from mongoengine.fields import (
+    StringField,
+    ReferenceField,
+    ListField,
+    FloatField,
+    DateTimeField,
+    BooleanField,
+    DictField,
+)
 from datetime import datetime as dt
+
 
 class User(Document):
     googleID = StringField()
@@ -9,20 +17,21 @@ class User(Document):
     name = StringField(required=True)
     preferences = DictField(required=True)
 
+
 class Trip(Document):
 
-    creator = ReferenceField('User')
+    creator = ReferenceField("User")
     meetingPoint = StringField(required=True)
     meetingPointWazeUrl = StringField(required=True)
     description = StringField(required=True)
-    participants = ListField(ReferenceField('User'))
+    participants = ListField(ReferenceField("User"))
     dateTime = DateTimeField(required=True)
     isTripToday = BooleanField(required=True, default=False)
 
     def updateTrip(self):
         if self.dateTime.date() == dt.today().date():
-                self.isTripToday = True
-                self.save()
+            self.isTripToday = True
+            self.save()
 
     def isUserJoined(self, user):
         for p in self.participants:
@@ -31,11 +40,10 @@ class Trip(Document):
         return False
 
 
-
 class UserLiveGPSCoordinates(Document):
 
-    user = ReferenceField('User')
-    trip = ReferenceField('Trip')
+    user = ReferenceField("User")
+    trip = ReferenceField("Trip")
     longitude = FloatField(required=True)
     latitude = FloatField(required=True)
 
