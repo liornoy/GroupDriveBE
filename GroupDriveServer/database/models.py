@@ -1,13 +1,13 @@
 from mongoengine import Document
 from mongoengine.fields import StringField, ReferenceField, ListField, \
-    FloatField, DateTimeField, BooleanField
+    FloatField, DateTimeField, BooleanField, DictField
 from datetime import datetime as dt
 
 class User(Document):
-
+    googleID = StringField()
     photoURL = StringField()
     name = StringField(required=True)
-
+    preferences = DictField(required=True)
 
 class Trip(Document):
 
@@ -25,7 +25,7 @@ class Trip(Document):
                 self.save()
 
 
-class UserLiveGPSCoordinate(Document):
+class UserLiveGPSCoordinates(Document):
 
     user = ReferenceField('User')
     trip = ReferenceField('Trip')
