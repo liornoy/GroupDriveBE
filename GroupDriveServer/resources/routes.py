@@ -1,6 +1,6 @@
 from .users import UserApi, UsersApi
 from .trips import TripApi, TripsApi
-from .events import JoinTripApi, LoginApi
+from .events import JoinTripApi, LoginApi,UpdateCoordinatesAPI
 
 
 def initialize_routes(api):
@@ -17,8 +17,9 @@ def initialize_routes(api):
 
     # Events API
 
-    api.add_resource(JoinTripApi,
+    api.add_resource(JoinTripApi,   
                      '/api/events/jointrip/<trip_id>')
     api.add_resource(LoginApi,
                      '/api/events/login')
-   
+    api.add_resource(UpdateCoordinatesAPI,
+                     '/api/events/updatecoordinates/<trip_id>')
