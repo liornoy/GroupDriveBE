@@ -4,7 +4,8 @@ from .errors import UserNotExistsError
 from mongoengine.errors import DoesNotExist
 from database.models import User, UserLiveGPSCoordinates
 from database.preference_enum import EPreference
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+
 import datetime
 
 
@@ -13,28 +14,6 @@ class UserApi(Resource):
         user = User.objects().get(id=userId)
         return Response(user, mimetype="application/json", status=200)
 
-    def put(self, userId):
-        body = request.get_json(force=True)
-        user = User.objects().get(id=userId)
-        user.update(**body)
-        user.save()
-        return Response(status=200)
-
-    def delete(self, userId):
-        try:
-            user = User.objects().get(id=userId)
-        except DoesNotExist:
-            raise UserNotExistsError                  
-        # Deleting all existing coordinates for this trip user the database.
-        try:
-            coordinates = UserLiveGPSCoordinates.objects().filter(user=user)
-            for c in coordinates:
-                c.delete()
-        except DoesNotExist:
-            pass
-        
-        user.delete()
-        return Response(status=200)
 
 class UsersApi(Resource):
     def get(self):
@@ -60,3 +39,35 @@ class UsersApi(Resource):
                 identity=str(user.googleID), expires_delta=expires
             )
         return {"token": access_token}, 200
+
+    @jwt_required()
+    def put(self):
+        userGoogleId = get_jwt_identity()
+        body = request.get_json(force=True)
+        try:
+            user = User.objects().get(googleID=userGoogleId)
+        except DoesNotExist:
+            raise UserNotExistsError
+
+        user.update(**body)
+        user.save()
+        return Response(status=200)
+
+    @jwt_required()
+    def delete(self):
+        userGoogleId = get_jwt_identity()
+        try:
+            user = User.objects().get(googleID=userGoogleId)
+        except DoesNotExist:
+            raise UserNotExistsError
+
+        # Deleting all existing coordinates for this trip user the database.
+        try:
+            coordinates = UserLiveGPSCoordinates.objects().filter(user=user)
+            for c in coordinates:
+                c.delete()
+        except DoesNotExist:
+            pass
+
+        user.delete()
+        return Response(status=200)
