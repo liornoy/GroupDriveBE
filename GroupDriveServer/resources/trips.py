@@ -77,6 +77,27 @@ class TripsApi(Resource):
         return Response(mimetype="application/json", status=200)
 
 
+class GetCoordinatesAPI(Resource):
+    @jwt_required()
+    def post(self, tripId):
+        userGoogleId = get_jwt_identity()
+        try:
+            user = User.objects().get(googleID=userGoogleId)
+        except DoesNotExist:
+            raise UserNotExistsError
+        try:
+            trip = Trip.objects().get(id=tripId)
+        except DoesNotExist:
+            raise TripNotExistsError
+
+        # Checking permissions - user must be creator
+        if trip.creator != user:
+            raise UnauthorizedError
+
+        coordinates = trip.getParticipantsCoordinates()
+        return Response(coordinates, status=200)
+
+
 class UpdateCoordinatesAPI(Resource):
     @jwt_required()
     def post(self, tripId):
