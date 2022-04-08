@@ -90,10 +90,6 @@ class GetCoordinatesAPI(Resource):
         except DoesNotExist:
             raise TripNotExistsError
 
-        # Checking permissions - user must be creator
-        if trip.creator != user:
-            raise UnauthorizedError
-
         coordinates = trip.getParticipantsCoordinates()
         return Response(coordinates, status=200)
 
