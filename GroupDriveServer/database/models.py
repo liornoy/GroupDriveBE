@@ -9,6 +9,8 @@ from mongoengine.fields import (
     DictField,
 )
 from datetime import datetime as dt
+from mongoengine.errors import DoesNotExist
+from json import dumps
 
 
 class User(Document):
@@ -16,7 +18,6 @@ class User(Document):
     photoURL = StringField()
     name = StringField(required=True)
     preferences = DictField(required=True)
-
 
 class Trip(Document):
 
@@ -42,6 +43,16 @@ class Trip(Document):
     def addUser(self, user):
         self.participants.append(user)
         self.save()
+
+    def getParticipantsCoordinates(self):
+        coordinates = []
+        for p in self.participants:
+            try:
+                c = UserLiveGPSCoordinates.objects().get(user=p)
+            except DoesNotExist:
+                continue
+            coordinates += [c]
+        return dumps(coordinates)
 
 
 class UserLiveGPSCoordinates(Document):
