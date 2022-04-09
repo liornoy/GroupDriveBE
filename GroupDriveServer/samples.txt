@@ -1,8 +1,17 @@
 {
+"googleID": "1",
+"photoURL": "url",
+"name": "lior"
+}
+{
 "tripID": "1",
 "title": "Fun on NY",
 "meetingPoint": "Times Square",
 "meetingPointWazeUrl": "https://www.waze.com/ul?ll=40.75889500%2C-73.98513100&navigate=yes&zoom=17",
 "description": "This is a trip all around NY",
-"dateTime": "2022-04-09T16:00:00Z"
+"dateTime": "2022-04-09"
+}
+{
+    "longitude": 3,
+    "latitude": 4
 }
