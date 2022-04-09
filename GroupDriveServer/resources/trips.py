@@ -100,13 +100,13 @@ class UpdateCoordinatesAPI(Resource):
         except DoesNotExist:
             raise UserNotExistsError
         try:
-            trip = Trip.objects().get(id=tripId)
+            trip = Trip.objects().get(tripID=tripId)
         except DoesNotExist:
             raise TripNotExistsError
 
         body = request.get_json(force=True)
-        body["user"] = user.id
-        body["trip"] = trip.id
+        body["user"] = user.googleID
+        body["trip"] = trip.tripID
         newCoordinates = UserLiveGPSCoordinates(**body)
 
         if newCoordinates.isValid() is not True:
