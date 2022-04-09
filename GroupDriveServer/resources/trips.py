@@ -29,7 +29,7 @@ class TripApi(Resource):
             raise TripNotExistsError
 
         # Checking permissions - user must be creator
-        if trip.creator.googleID != userGoogleId:
+        if trip.creatorGID != userGoogleId:
             raise UnauthorizedError
         trip.update(**body)
         trip.updateTrip()
@@ -37,16 +37,11 @@ class TripApi(Resource):
         return Response(status=200)
 
     def delete(self, tripId):
-        userGoogleId = request.headers.get("google-id")
         try:
             trip = Trip.objects().get(id=tripId)
 
         except DoesNotExist:
             raise TripNotExistsError
-        # Checking permissions - user must be creator
-        if trip.creator.googleID != userGoogleId:
-            raise UnauthorizedError
-
         # Deleting all existing coordinates for this trip from the database.
         try:
             coordinates = UserLiveGPSCoordinates.objects().filter(trip=trip)
@@ -68,8 +63,15 @@ class TripsApi(Resource):
         return Response(trips.to_json(), mimetype="application/json", status=200)
 
     def post(self):
+        userGoogleId = request.headers.get("google-id")
+        try:
+            user = User.objects().get(googleID=userGoogleId)
+        except DoesNotExist:
+            raise UserNotExistsError
         body = request.get_json(force=True)
         trip = Trip(**body)
+        trip.creator = userGoogleId
+        trip.participants.append(userGoogleId)
         trip.save()
         return Response(mimetype="application/json", status=200)
 

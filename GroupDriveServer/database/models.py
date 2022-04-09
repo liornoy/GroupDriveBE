@@ -23,11 +23,11 @@ class User(Document):
 class Trip(Document):
     tripID = IntField()
     title = StringField()
-    creator = ReferenceField("User")
+    creatorGID = StringField()
     meetingPoint = StringField(required=True)
     meetingPointWazeUrl = StringField(required=True)
     description = StringField(required=True)
-    participants = ListField(ReferenceField("User"))
+    participants = ListField(StringField())
     dateTime = DateTimeField(required=True)
     isTripToday = BooleanField(required=True, default=False)
 
@@ -42,8 +42,8 @@ class Trip(Document):
                 return True
         return False
 
-    def addUser(self, user):
-        self.participants.append(user)
+    def addUser(self, user_GID):
+        self.participants.append(user_GID)
         self.save()
 
     def getParticipantsCoordinates(self):
