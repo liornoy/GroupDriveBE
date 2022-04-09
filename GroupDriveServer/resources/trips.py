@@ -134,9 +134,9 @@ class JoinTripApi(Resource):
             raise UserNotExistsError
 
         try:
-            trip = Trip.objects().get(id=tripId)
+            trip = Trip.objects().get(tripID=tripId)
         except DoesNotExist:
             raise TripNotExistsError
 
-        trip.addUser(user)
+        trip.addUser(user.googleID)
         return Response(status=200)
