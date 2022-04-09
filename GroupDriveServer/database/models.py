@@ -6,7 +6,7 @@ from mongoengine.fields import (
     FloatField,
     DateTimeField,
     BooleanField,
-    DictField,
+    IntField,
 )
 from datetime import datetime as dt
 from mongoengine.errors import DoesNotExist
@@ -17,10 +17,12 @@ class User(Document):
     googleID = StringField()
     photoURL = StringField()
     name = StringField(required=True)
-    preferences = DictField(required=True)
+    # preferences = DictField(required=True)
+
 
 class Trip(Document):
-
+    tripID = IntField()
+    title = StringField()
     creator = ReferenceField("User")
     meetingPoint = StringField(required=True)
     meetingPointWazeUrl = StringField(required=True)

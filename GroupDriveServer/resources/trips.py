@@ -2,7 +2,6 @@ from flask_restful import Resource
 from flask import Response, request
 from database.models import Trip, User, UserLiveGPSCoordinates
 from mongoengine.errors import DoesNotExist
-from flask_jwt_extended import jwt_required, get_jwt_identity
 from resources.errors import (
     TripNotExistsError,
     UserNotExistsError,
@@ -21,9 +20,8 @@ class TripApi(Resource):
         except DoesNotExist:
             raise TripNotExistsError
 
-    @jwt_required()
-    def put(self, tripId):
-        userGoogleId = get_jwt_identity()
+    def put(self, tripId, userGoogleId):
+        userGoogleId = request.headers.get("google-id")
         body = request.get_json(force=True)
         try:
             trip = Trip.objects().get(id=tripId)
@@ -38,9 +36,8 @@ class TripApi(Resource):
         trip.save()
         return Response(status=200)
 
-    @jwt_required()
     def delete(self, tripId):
-        userGoogleId = get_jwt_identity()
+        userGoogleId = request.headers.get("google-id")
         try:
             trip = Trip.objects().get(id=tripId)
 
@@ -78,9 +75,8 @@ class TripsApi(Resource):
 
 
 class GetCoordinatesAPI(Resource):
-    @jwt_required()
     def post(self, tripId):
-        userGoogleId = get_jwt_identity()
+        userGoogleId = request.headers.get("google-id")
         try:
             user = User.objects().get(googleID=userGoogleId)
         except DoesNotExist:
@@ -95,9 +91,8 @@ class GetCoordinatesAPI(Resource):
 
 
 class UpdateCoordinatesAPI(Resource):
-    @jwt_required()
     def post(self, tripId):
-        userGoogleId = get_jwt_identity()
+        userGoogleId = request.headers.get("google-id")
         try:
             user = User.objects().get(googleID=userGoogleId)
         except DoesNotExist:
@@ -129,9 +124,8 @@ class UpdateCoordinatesAPI(Resource):
 
 
 class JoinTripApi(Resource):
-    @jwt_required()
     def post(self, tripId):
-        userGoogleId = get_jwt_identity()
+        userGoogleId = request.headers.get("google-id")
         try:
             user = User.objects().get(googleID=userGoogleId)
         except DoesNotExist:

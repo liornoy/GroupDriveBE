@@ -4,7 +4,6 @@ from .errors import UserNotExistsError
 from mongoengine.errors import DoesNotExist
 from database.models import User, UserLiveGPSCoordinates
 from database.preference_enum import EPreference
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 
 import datetime
 
@@ -23,26 +22,15 @@ class UsersApi(Resource):
     def post(self):
         body = request.get_json(force=True)
         user = User(**body)
-
         try:
             User.objects().get(googleID=user.googleID)
-
         except DoesNotExist:
-            preferences = {}
-            for p in EPreference:
-                preferences.update({p.name: 0})
-            user.preferences = preferences
             user.save()
 
-            expires = datetime.timedelta(days=7)
-            access_token = create_access_token(
-                identity=str(user.googleID), expires_delta=expires
-            )
-        return {"token": access_token}, 200
+        return Response(status=200)
 
-    @jwt_required()
     def put(self):
-        userGoogleId = get_jwt_identity()
+        userGoogleId = request.headers.get("google-id")
         body = request.get_json(force=True)
         try:
             user = User.objects().get(googleID=userGoogleId)
@@ -53,9 +41,8 @@ class UsersApi(Resource):
         user.save()
         return Response(status=200)
 
-    @jwt_required()
     def delete(self):
-        userGoogleId = get_jwt_identity()
+        userGoogleId = request.headers.get("google-id")
         try:
             user = User.objects().get(googleID=userGoogleId)
         except DoesNotExist:
