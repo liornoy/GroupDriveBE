@@ -3,6 +3,7 @@ from flask import Response, request
 from .errors import UserNotExistsError
 from mongoengine.errors import DoesNotExist
 from database.models import User, UserLiveGPSCoordinates
+
 # from database.preference_enum import EPreference
 
 import datetime

@@ -14,31 +14,31 @@ from json import dumps
 
 
 class User(Document):
-    googleID = StringField()
+    googleID = StringField(required=True, primary_key=True)
     photoURL = StringField()
     name = StringField(required=True)
     # preferences = DictField(required=True)
 
 
 class Trip(Document):
-    tripID = IntField()
-    title = StringField()
-    creatorGID = StringField()
+    tripID = IntField(required=True, primary_key=True)
+    title = StringField(required=True)
+    creatorGID = StringField(required=True)
     meetingPoint = StringField(required=True)
-    meetingPointWazeUrl = StringField(required=True)
-    description = StringField(required=True)
+    meetingPointWazeUrl = StringField()
+    description = StringField()
     participants = ListField(StringField())
     dateTime = DateTimeField(required=True)
-    isTripToday = BooleanField(required=True, default=False)
+    isTripToday = BooleanField(default=False)
 
     def updateTrip(self):
         if self.dateTime.date() == dt.today().date():
             self.isTripToday = True
             self.save()
 
-    def isUserJoined(self, user):
+    def isUserJoined(self, user_GID):
         for p in self.participants:
-            if p == user:
+            if p == user_GID:
                 return True
         return False
 
@@ -50,21 +50,22 @@ class Trip(Document):
         coordinates = []
         for p in self.participants:
             try:
-                c = UserLiveGPSCoordinates.objects().get(user=p)
+                c = UserLiveGPSCoordinates.objects().get(userGID=p)
             except DoesNotExist:
                 continue
-            coordinates += [c]
-        return dumps(coordinates)
+            coordinates += [c.to_json()]
+        return coordinates
 
 
 class UserLiveGPSCoordinates(Document):
-
-    user = ReferenceField("User")
-    trip = ReferenceField("Trip")
+    userGID = StringField(required=True)
+    tripID = IntField(required=True)
     longitude = FloatField(required=True)
     latitude = FloatField(required=True)
 
     def isValid(self):
-        joinedTrip = self.trip.isUserJoined(self.user)
-        isTripToday = self.trip.isTripToday
+        trip = Trip.objects().get(tripID=self.tripID)
+
+        joinedTrip = trip.isUserJoined(self.userGID)
+        isTripToday = trip.isTripToday
         return joinedTrip and isTripToday
