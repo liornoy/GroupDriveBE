@@ -1,5 +1,6 @@
 from flask_restful import Resource
 from flask import Response, request
+from bson.json_util import dumps
 from database.models import Trip, User, UserLiveGPSCoordinates
 from mongoengine.errors import DoesNotExist
 from resources.errors import (
@@ -44,7 +45,7 @@ class TripApi(Resource):
             raise TripNotExistsError
         # Deleting all existing coordinates for this trip from the database.
         try:
-            coordinates = UserLiveGPSCoordinates.objects().filter(trip=trip)
+            coordinates = UserLiveGPSCoordinates.objects().filter(tripID=tripId)
             for c in coordinates:
                 c.delete()
         except DoesNotExist:
@@ -57,10 +58,14 @@ class TripApi(Resource):
 class TripsApi(Resource):
     def get(self):
         trips = Trip.objects()
-        tripsList = list(trips)
-        for trip in tripsList:
+        tripsList = []
+        for trip in trips:
             trip.updateTrip()
-        return Response(trips.to_json(), mimetype="application/json", status=200)
+            trip_dict = trip.to_mongo().to_dict()
+            trip_dict['dateTime'] = trip.dateTime.isoformat()
+            tripsList.append(trip_dict)
+        trips_json=dumps(tripsList)
+        return Response(trips_json, mimetype="application/json", status=200)
 
     def post(self):
         userGoogleId = request.headers.get("google-id")
