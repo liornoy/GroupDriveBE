@@ -51,7 +51,7 @@ class UsersApi(Resource):
 
         # Deleting all existing coordinates for this trip user the database.
         try:
-            coordinates = UserLiveGPSCoordinates.objects().filter(user=user)
+            coordinates = UserLiveGPSCoordinates.objects().filter(userGID=userGoogleId)
             for c in coordinates:
                 c.delete()
         except DoesNotExist:
