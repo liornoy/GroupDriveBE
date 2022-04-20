@@ -1,16 +1,14 @@
 from mongoengine import Document
 from mongoengine.fields import (
     StringField,
-    ReferenceField,
     ListField,
     FloatField,
-    DateTimeField,
+    DateField,
     BooleanField,
     IntField,
 )
 from datetime import datetime as dt
 from mongoengine.errors import DoesNotExist
-from json import dumps
 
 
 class User(Document):
@@ -28,13 +26,15 @@ class Trip(Document):
     meetingPointWazeUrl = StringField()
     description = StringField()
     participants = ListField(StringField())
-    dateTime = DateTimeField(required=True)
+    date = DateField(required=True)
     isTripToday = BooleanField(default=False)
 
     def updateTrip(self):
-        if self.dateTime.date() == dt.today().date():
+        if self.date == dt.today().date():
             self.isTripToday = True
-            self.save()
+        else:
+            self.isTripToday = False
+        self.save()
 
     def isUserJoined(self, user_GID):
         for p in self.participants:
