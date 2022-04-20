@@ -34,7 +34,6 @@ class TripApi(Resource):
             raise UnauthorizedError
         trip.update(**body)
         trip.updateTrip()
-        trip.save()
         return Response(status=200)
 
     def delete(self, tripId):
@@ -62,7 +61,7 @@ class TripsApi(Resource):
         for trip in trips:
             trip.updateTrip()
             trip_dict = trip.to_mongo().to_dict()
-            trip_dict['dateTime'] = trip.dateTime.isoformat()
+            trip_dict['date'] = trip.date.isoformat()
             tripsList.append(trip_dict)
         trips_json=dumps(tripsList)
         return Response(trips_json, mimetype="application/json", status=200)
