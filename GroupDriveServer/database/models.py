@@ -5,7 +5,6 @@ from mongoengine.fields import (
     FloatField,
     DateField,
     BooleanField,
-    IntField,
 )
 from datetime import datetime as dt
 from mongoengine.errors import DoesNotExist
@@ -19,7 +18,7 @@ class User(Document):
 
 
 class Trip(Document):
-    tripID = IntField(required=True, primary_key=True)
+    tripID = StringField(required=True, primary_key=True)
     title = StringField(required=True)
     creatorGID = StringField(required=True)
     meetingPoint = StringField(required=True)
@@ -59,7 +58,7 @@ class Trip(Document):
 
 class UserLiveGPSCoordinates(Document):
     userGID = StringField(required=True)
-    tripID = IntField(required=True)
+    tripID = StringField(required=True)
     longitude = FloatField(required=True)
     latitude = FloatField(required=True)
 

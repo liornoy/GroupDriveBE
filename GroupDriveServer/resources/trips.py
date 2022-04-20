@@ -25,7 +25,7 @@ class TripApi(Resource):
         userGoogleId = request.headers.get("google-id")
         body = request.get_json(force=True)
         try:
-            trip = Trip.objects().get(id=tripId)
+            trip = Trip.objects().get(tripID=tripId)
         except DoesNotExist:
             raise TripNotExistsError
 
