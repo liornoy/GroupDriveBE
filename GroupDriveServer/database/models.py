@@ -25,7 +25,7 @@ class Trip(Document):
     meetingPointWazeUrl = StringField()
     description = StringField()
     participants = ListField(StringField())
-    date = DateField(required=True)
+    date = DateField(required=True, default=dt.today)
     isTripToday = BooleanField(default=False)
 
     def updateTrip(self):

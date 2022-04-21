@@ -9,6 +9,7 @@ from resources.errors import (
     UnauthorizedError,
     InternalServerError,
 )
+from datetime import datetime as dt
 
 
 class TripApi(Resource):
@@ -75,6 +76,8 @@ class TripsApi(Resource):
         body = request.get_json(force=True)
         body["creatorGID"] = userGoogleId
         trip = Trip(**body)
+        if trip.date == "":
+            trip.date = dt.today()
         trip.participants.append(userGoogleId)
         trip.save()
         return Response(mimetype="application/json", status=200)

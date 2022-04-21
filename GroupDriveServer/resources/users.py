@@ -11,7 +11,7 @@ import datetime
 
 class UserApi(Resource):
     def get(self, userId):
-        user = User.objects().get(id=userId)
+        user = User.objects().get(googleID=userId).to_json()
         return Response(user, mimetype="application/json", status=200)
 
 
