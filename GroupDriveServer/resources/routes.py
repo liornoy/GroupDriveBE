@@ -1,4 +1,4 @@
-from .users import UserApi, UsersApi
+from .users import SignIn,SignUp, UsersApi
 from .trips import (
     TripApi,
     TripsApi,
@@ -13,7 +13,9 @@ def initialize_routes(api):
     # Users API
 
     api.add_resource(UsersApi, "/api/users")
-    api.add_resource(UserApi, "/api/users/<userId>")
+    api.add_resource(SignIn, "/api/users/sign-in/<username>/<password>")
+    api.add_resource(SignUp, "/api/users/sign-up/<username>/<password>")
+    #api.add_resource(Userget, "/api/users/<userID>")
 
     # Trips API
 

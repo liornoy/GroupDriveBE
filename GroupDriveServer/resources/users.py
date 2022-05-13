@@ -3,59 +3,38 @@ from flask import Response, request
 from .errors import UserNotExistsError
 from mongoengine.errors import DoesNotExist
 from database.models import User, UserLiveGPSCoordinates
+class SignIn(Resource):
+    def post(self, username, password):
+        try:
+            print("signin got: ",username," and ", password)
+            user = User.objects().get(username=username, password= password)
+            return Response(str(username), mimetype="application/json", status=200)
+        except DoesNotExist:
+            return Response("error", mimetype="application/json", status=500)
 
-# from database.preference_enum import EPreference
-
-import datetime
-
-
-class UserApi(Resource):
-    def get(self, userId):
-        user = User.objects().get(googleID=userId).to_json()
-        return Response(user, mimetype="application/json", status=200)
+class SignUp(Resource):
+    def post(self, username, password):
+        try:
+            print("signup got: ",username," and ", password)
+            user = User.objects().get(username=username)
+        except DoesNotExist:
+            newUser = User()
+            newUser.username = username
+            newUser.password = password
+            newUser.save()
+            return Response(str(username), mimetype="application/json", status=200)
+        return Response("error", mimetype="application/json", status=500)
+        
+# class Userget(Resource):
+#     def get(self,username):
+#         try:
+#             user = User.objects().get(userID = userID)
+#             return Response(str(user.username), mimetype="application/json", status=200)
+#         except DoesNotExist:
+#             return Response("error", mimetype="application/json", status=500)
 
 
 class UsersApi(Resource):
     def get(self):
         users = User.objects().to_json()
         return Response(users, mimetype="application/json", status=200)
-
-    def post(self):
-        body = request.get_json(force=True)
-        user = User(**body)
-        try:
-            User.objects().get(googleID=user.googleID)
-        except DoesNotExist:
-            user.save()
-
-        return Response(status=200)
-
-    def put(self):
-        userGoogleId = request.headers.get("google-id")
-        body = request.get_json(force=True)
-        try:
-            user = User.objects().get(googleID=userGoogleId)
-        except DoesNotExist:
-            raise UserNotExistsError
-
-        user.update(**body)
-        user.save()
-        return Response(status=200)
-
-    def delete(self):
-        userGoogleId = request.headers.get("google-id")
-        try:
-            user = User.objects().get(googleID=userGoogleId)
-        except DoesNotExist:
-            raise UserNotExistsError
-
-        # Deleting all existing coordinates for this trip user the database.
-        try:
-            coordinates = UserLiveGPSCoordinates.objects().filter(userGID=userGoogleId)
-            for c in coordinates:
-                c.delete()
-        except DoesNotExist:
-            pass
-
-        user.delete()
-        return Response(status=200)

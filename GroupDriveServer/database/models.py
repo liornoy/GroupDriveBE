@@ -11,16 +11,15 @@ from mongoengine.errors import DoesNotExist
 
 
 class User(Document):
-    googleID = StringField(required=True, primary_key=True)
-    photoURL = StringField()
-    name = StringField(required=True)
+    username = StringField(required=True)
+    password = StringField(required=True)
     # preferences = DictField(required=True)
 
 
 class Trip(Document):
     tripID = StringField(required=True, primary_key=True)
     title = StringField(required=True)
-    creatorGID = StringField(required=True)
+    creator = StringField(required=True)
     meetingPoint = StringField(required=True)
     meetingPointWazeUrl = StringField()
     description = StringField()
@@ -35,21 +34,22 @@ class Trip(Document):
             self.isTripToday = False
         self.save()
 
-    def isUserJoined(self, user_GID):
+    def isUserJoined(self, creator):
         for p in self.participants:
-            if p == user_GID:
+            if p == creator:
                 return True
         return False
 
-    def addUser(self, user_GID):
-        self.participants.append(user_GID)
-        self.save()
+    def addUser(self, creator):
+        if self.isUserJoined(creator) == False:
+            self.participants.append(creator)
+            self.save()
 
     def getParticipantsCoordinates(self):
         coordinates = []
         for p in self.participants:
             try:
-                c = UserLiveGPSCoordinates.objects().get(userGID=p)
+                c = UserLiveGPSCoordinates.objects().get(creator=p)
             except DoesNotExist:
                 continue
             coordinates += [c.to_json()]
@@ -57,7 +57,7 @@ class Trip(Document):
 
 
 class UserLiveGPSCoordinates(Document):
-    userGID = StringField(required=True)
+    user = StringField(required=True)
     tripID = StringField(required=True)
     longitude = FloatField(required=True)
     latitude = FloatField(required=True)
@@ -65,6 +65,6 @@ class UserLiveGPSCoordinates(Document):
     def isValid(self):
         trip = Trip.objects().get(tripID=self.tripID)
 
-        joinedTrip = trip.isUserJoined(self.userGID)
+        joinedTrip = trip.isUserJoined(self.user)
         isTripToday = trip.isTripToday
         return joinedTrip and isTripToday
