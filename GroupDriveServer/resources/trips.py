@@ -23,7 +23,7 @@ class TripApi(Resource):
             raise TripNotExistsError
 
     def put(self, tripId):
-        userGoogleId = request.headers.get("google-id")
+        user = request.headers.get("username")
         body = request.get_json(force=True)
         try:
             trip = Trip.objects().get(tripID=tripId)
@@ -31,7 +31,7 @@ class TripApi(Resource):
             raise TripNotExistsError
 
         # Checking permissions - user must be creator
-        if trip.creatorGID != userGoogleId:
+        if trip.creator != user:
             raise UnauthorizedError
         trip.update(**body)
         trip.updateTrip()
@@ -68,17 +68,11 @@ class TripsApi(Resource):
         return Response(trips_json, mimetype="application/json", status=200)
 
     def post(self):
-        userGoogleId = request.headers.get("google-id")
-        try:
-            user = User.objects().get(googleID=userGoogleId)
-        except DoesNotExist:
-            raise UserNotExistsError
         body = request.get_json(force=True)
-        body["creatorGID"] = userGoogleId
         trip = Trip(**body)
         if trip.date == "":
             trip.date = dt.today()
-        trip.participants.append(userGoogleId)
+        trip.participants.append(trip.creator)
         trip.save()
         return Response(mimetype="application/json", status=200)
 
@@ -96,18 +90,14 @@ class GetCoordinatesAPI(Resource):
 
 class UpdateCoordinatesAPI(Resource):
     def post(self, tripId):
-        userGoogleId = request.headers.get("google-id")
-        try:
-            user = User.objects().get(googleID=userGoogleId)
-        except DoesNotExist:
-            raise UserNotExistsError
+        user = request.headers.get("username")
         try:
             trip = Trip.objects().get(tripID=tripId)
         except DoesNotExist:
             raise TripNotExistsError
 
         body = request.get_json(force=True)
-        body["userGID"] = userGoogleId
+        body["user"] = user
         body["tripID"] = tripId
         newCoordinates = UserLiveGPSCoordinates(**body)
         if newCoordinates.isValid() is not True:
@@ -116,7 +106,7 @@ class UpdateCoordinatesAPI(Resource):
         # if user allready has coordinates in the database update it
         try:
             userCoordinate = UserLiveGPSCoordinates.objects().get(
-                userGID=userGoogleId, tripID=tripId
+                user=user, tripID=tripId
             )
         except DoesNotExist:
             newCoordinates.save()
@@ -131,16 +121,11 @@ class UpdateCoordinatesAPI(Resource):
 
 class JoinTripApi(Resource):
     def post(self, tripId):
-        userGoogleId = request.headers.get("google-id")
-        try:
-            user = User.objects().get(googleID=userGoogleId)
-        except DoesNotExist:
-            raise UserNotExistsError
-
+        user = request.headers.get("username")
         try:
             trip = Trip.objects().get(tripID=tripId)
         except DoesNotExist:
             raise TripNotExistsError
 
-        trip.addUser(user.googleID)
+        trip.addUser(user)
         return Response(status=200)
