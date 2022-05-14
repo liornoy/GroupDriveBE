@@ -1,3 +1,4 @@
+from uuid import uuid4
 from flask_restful import Resource
 from flask import Response, request
 from bson.json_util import dumps
@@ -10,7 +11,7 @@ from resources.errors import (
     InternalServerError,
 )
 from datetime import datetime as dt
-
+import uuid
 
 class TripApi(Resource):
     def get(self, tripId):
@@ -76,16 +77,21 @@ class TripsApi(Resource):
         trip.save()
         return Response(mimetype="application/json", status=200)
 
-
 class GetCoordinatesAPI(Resource):
-    def get(self, tripId):
+    def post(self, tripId):
         try:
             trip = Trip.objects().get(_id=tripId)
         except DoesNotExist:
             raise TripNotExistsError
 
-        coordinates = trip.getParticipantsCoordinates()
-        return Response(coordinates, status=200)
+        coordinates = UserLiveGPSCoordinates.objects()
+        coordList = []
+        for c in coordinates:
+            if c.tripID == tripId:
+                cAdd = c.to_mongo().to_dict()
+                coordList.append(cAdd)
+        coor_json = dumps(coordList)
+        return Response(coor_json , status=200)
 
 
 class UpdateCoordinatesAPI(Resource):
@@ -109,6 +115,7 @@ class UpdateCoordinatesAPI(Resource):
                 user=user, tripID=tripId
             )
         except DoesNotExist:
+            newCoordinates._id=str(uuid.uuid4())
             newCoordinates.save()
             return Response(status=200)
 
@@ -121,11 +128,11 @@ class UpdateCoordinatesAPI(Resource):
 
 class JoinTripApi(Resource):
     def post(self, tripId):
-        user = request.headers.get("username")
+        username = request.headers.get("username")
         try:
             trip = Trip.objects().get(_id=tripId)
         except DoesNotExist:
             raise TripNotExistsError
 
-        trip.addUser(user)
+        trip.addUser(username)
         return Response(status=200)
