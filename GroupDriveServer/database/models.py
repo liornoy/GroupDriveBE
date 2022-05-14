@@ -17,7 +17,7 @@ class User(Document):
 
 
 class Trip(Document):
-    tripID = StringField(required=True, primary_key=True)
+    _id = StringField(required=True, primary_key=True)
     title = StringField(required=True)
     creator = StringField(required=True)
     meetingPoint = StringField(required=True)
@@ -40,9 +40,14 @@ class Trip(Document):
                 return True
         return False
 
-    def addUser(self, creator):
-        if self.isUserJoined(creator) == False:
-            self.participants.append(creator)
+    def addUser(self, username):
+        if self.isUserJoined(username) == False:
+            print("added", username)
+            self.participants.append(str(username))
+            self.save()
+        else:
+            self.participants.remove(str(username))
+            print("removed", username)
             self.save()
 
     def getParticipantsCoordinates(self):
@@ -63,7 +68,7 @@ class UserLiveGPSCoordinates(Document):
     latitude = FloatField(required=True)
 
     def isValid(self):
-        trip = Trip.objects().get(tripID=self.tripID)
+        trip = Trip.objects().get(_id=self.tripID)
 
         joinedTrip = trip.isUserJoined(self.user)
         isTripToday = trip.isTripToday
