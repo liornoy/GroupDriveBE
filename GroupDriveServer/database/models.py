@@ -50,18 +50,11 @@ class Trip(Document):
             print("removed", username)
             self.save()
 
-    def getParticipantsCoordinates(self):
-        coordinates = []
-        for p in self.participants:
-            try:
-                c = UserLiveGPSCoordinates.objects().get(creator=p)
-            except DoesNotExist:
-                continue
-            coordinates += [c.to_json()]
-        return coordinates
+  
 
 
 class UserLiveGPSCoordinates(Document):
+    _id = StringField(required=True, primary_key=True)
     user = StringField(required=True)
     tripID = StringField(required=True)
     longitude = FloatField(required=True)
