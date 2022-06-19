@@ -1,4 +1,3 @@
-from uuid import uuid4
 from flask_restful import Resource
 from flask import Response, request
 from bson.json_util import dumps
@@ -11,12 +10,12 @@ from resources.errors import (
     InternalServerError,
 )
 from datetime import datetime as dt
-import uuid
+
 
 class TripApi(Resource):
     def get(self, tripId):
         try:
-            trip = Trip.objects().get(_id=tripId)
+            trip = Trip.objects().get(tripID=tripId)
             # Updating the field isTripToday
             trip.updateTrip()
             return Response(trip.to_json(), mimetype="application/json", status=200)
@@ -27,7 +26,7 @@ class TripApi(Resource):
         user = request.headers.get("username")
         body = request.get_json(force=True)
         try:
-            trip = Trip.objects().get(_id=tripId)
+            trip = Trip.objects().get(tripID=tripId)
         except DoesNotExist:
             raise TripNotExistsError
 
@@ -40,13 +39,13 @@ class TripApi(Resource):
 
     def delete(self, tripId):
         try:
-            trip = Trip.objects().get(_id=tripId)
+            trip = Trip.objects().get(tripID=tripId)
 
         except DoesNotExist:
             raise TripNotExistsError
         # Deleting all existing coordinates for this trip from the database.
         try:
-            coordinates = UserLiveGPSCoordinates.objects().filter(_id=tripId)
+            coordinates = UserLiveGPSCoordinates.objects().filter(tripID=tripId)
             for c in coordinates:
                 c.delete()
         except DoesNotExist:
@@ -60,7 +59,13 @@ class TripsApi(Resource):
     def get(self):
         trips = Trip.objects()
         tripsList = []
+        creator_filter = request.headers.get("creator")
+            
         for trip in trips:
+            if creator_filter != None:
+                print("creatore_filter header: ",creator_filter)
+                if trip.creator != creator_filter:
+                    continue
             trip.updateTrip()
             trip_dict = trip.to_mongo().to_dict()
             trip_dict['date'] = trip.date.isoformat()
@@ -77,28 +82,23 @@ class TripsApi(Resource):
         trip.save()
         return Response(mimetype="application/json", status=200)
 
+
 class GetCoordinatesAPI(Resource):
-    def post(self, tripId):
+    def get(self, tripId):
         try:
-            trip = Trip.objects().get(_id=tripId)
+            trip = Trip.objects().get(tripID=tripId)
         except DoesNotExist:
             raise TripNotExistsError
 
-        coordinates = UserLiveGPSCoordinates.objects()
-        coordList = []
-        for c in coordinates:
-            if c.tripID == tripId:
-                cAdd = c.to_mongo().to_dict()
-                coordList.append(cAdd)
-        coor_json = dumps(coordList)
-        return Response(coor_json , status=200)
+        coordinates = trip.getParticipantsCoordinates()
+        return Response(coordinates, status=200)
 
 
 class UpdateCoordinatesAPI(Resource):
     def post(self, tripId):
         user = request.headers.get("username")
         try:
-            trip = Trip.objects().get(_id=tripId)
+            trip = Trip.objects().get(tripID=tripId)
         except DoesNotExist:
             raise TripNotExistsError
 
@@ -115,7 +115,6 @@ class UpdateCoordinatesAPI(Resource):
                 user=user, tripID=tripId
             )
         except DoesNotExist:
-            newCoordinates._id=str(uuid.uuid4())
             newCoordinates.save()
             return Response(status=200)
 
@@ -128,11 +127,12 @@ class UpdateCoordinatesAPI(Resource):
 
 class JoinTripApi(Resource):
     def post(self, tripId):
-        username = request.headers.get("username")
+        user = request.headers.get("username")
         try:
-            trip = Trip.objects().get(_id=tripId)
+            trip = Trip.objects().get(tripID=tripId)
         except DoesNotExist:
             raise TripNotExistsError
 
-        trip.addUser(username)
+        
+        trip.addUser(user)
         return Response(status=200)
