@@ -15,7 +15,7 @@ from datetime import datetime as dt
 class TripApi(Resource):
     def get(self, tripId):
         try:
-            trip = Trip.objects().get(tripID=tripId)
+            trip = Trip.objects().get(_id=tripId)
             # Updating the field isTripToday
             trip.updateTrip()
             return Response(trip.to_json(), mimetype="application/json", status=200)
@@ -26,7 +26,7 @@ class TripApi(Resource):
         user = request.headers.get("username")
         body = request.get_json(force=True)
         try:
-            trip = Trip.objects().get(tripID=tripId)
+            trip = Trip.objects().get(_id=tripId)
         except DoesNotExist:
             raise TripNotExistsError
 
@@ -39,7 +39,7 @@ class TripApi(Resource):
 
     def delete(self, tripId):
         try:
-            trip = Trip.objects().get(tripID=tripId)
+            trip = Trip.objects().get(_id=tripId)
 
         except DoesNotExist:
             raise TripNotExistsError
@@ -86,7 +86,7 @@ class TripsApi(Resource):
 class GetCoordinatesAPI(Resource):
     def get(self, tripId):
         try:
-            trip = Trip.objects().get(tripID=tripId)
+            trip = Trip.objects().get(_id=tripId)
         except DoesNotExist:
             raise TripNotExistsError
 
@@ -98,7 +98,7 @@ class UpdateCoordinatesAPI(Resource):
     def post(self, tripId):
         user = request.headers.get("username")
         try:
-            trip = Trip.objects().get(tripID=tripId)
+            trip = Trip.objects().get(_id=tripId)
         except DoesNotExist:
             raise TripNotExistsError
 
@@ -129,7 +129,7 @@ class JoinTripApi(Resource):
     def post(self, tripId):
         user = request.headers.get("username")
         try:
-            trip = Trip.objects().get(tripID=tripId)
+            trip = Trip.objects().get(_id=tripId)
         except DoesNotExist:
             raise TripNotExistsError
 
