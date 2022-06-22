@@ -28,28 +28,28 @@ class Trip(Document):
     date = DateField(required=True, default=dt.today)
     isTripToday = BooleanField(default=False)
 
-    def updateTrip(self):
+    def update_trip(self):
         if self.date == dt.today().date():
             self.isTripToday = True
         else:
             self.isTripToday = False
         self.save()
 
-    def isUserJoined(self, creator):
+    def is_user_joined(self, creator):
         for p in self.participants:
             if p == creator:
                 return True
         return False
 
-    def addUser(self, username):
-        if self.isUserJoined(username) == False:
+    def add_user(self, username):
+        if self.is_user_joined(username) == False:
             self.participants.append(str(username))
             self.save()
         else: 
             self.participants.remove(str(username))
             self.save()
 
-    def getParticipantsCoordinates(self):
+    def get_participants_coordinates(self):
         coors =  UserLiveGPSCoordinates.objects(tripID = self._id)
         c_list = []
         for c in coors:
@@ -67,9 +67,9 @@ class UserLiveGPSCoordinates(Document):
     longitude = FloatField(required=True)
     latitude = FloatField(required=True)
 
-    def isValid(self):
+    def is_valid(self):
         trip = Trip.objects().get(_id=self.tripID)
 
-        joinedTrip = trip.isUserJoined(self.user)
+        joinedTrip = trip.is_user_joined(self.user)
         isTripToday = trip.isTripToday
         return joinedTrip and isTripToday
