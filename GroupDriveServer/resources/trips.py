@@ -10,8 +10,8 @@ from resources.errors import (
     InternalServerError,
 )
 from datetime import datetime as dt
-
-
+from uuid import uuid4
+import uuid
 class TripApi(Resource):
     def get(self, tripId):
         try:
@@ -91,7 +91,7 @@ class GetCoordinatesAPI(Resource):
             raise TripNotExistsError
 
         coordinates = trip.getParticipantsCoordinates()
-        return Response(coordinates, status=200)
+        return Response(coordinates, mimetype="application/json", status=200)
 
 
 class UpdateCoordinatesAPI(Resource):
@@ -115,6 +115,7 @@ class UpdateCoordinatesAPI(Resource):
                 user=user, tripID=tripId
             )
         except DoesNotExist:
+            newCoordinates._id=str(uuid.uuid4())
             newCoordinates.save()
             return Response(status=200)
 

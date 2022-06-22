@@ -8,6 +8,7 @@ from mongoengine.fields import (
 )
 from datetime import datetime as dt
 from mongoengine.errors import DoesNotExist
+from bson.json_util import dumps
 
 
 class User(Document):
@@ -42,14 +43,20 @@ class Trip(Document):
 
     def addUser(self, username):
         if self.isUserJoined(username) == False:
-            print("added", username)
             self.participants.append(str(username))
             self.save()
-        else:
+        else: 
             self.participants.remove(str(username))
-            print("removed", username)
             self.save()
 
+    def getParticipantsCoordinates(self):
+        coors =  UserLiveGPSCoordinates.objects(tripID = self._id)
+        c_list = []
+        for c in coors:
+            c_dict = c.to_mongo().to_dict()
+            c_list.append(c_dict)
+        coors_json=dumps(c_list)
+        return coors_json
   
 
 
