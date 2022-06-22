@@ -1,10 +1,8 @@
 <!-- PROJECT LOGO -->
 <br />
-<div align="center">
-     <img src="https://user-images.githubusercontent.com/40122521/161384001-29ee805f-75f5-4abd-9276-503f38b9e673.png" alt="Logo" width="150" height="100">
-      <h3 align="center">GroupDrive-Backend</h3>
-</div>
 
+![WhatsApp Image 2022-06-19 at 10 26 32 PM](https://user-images.githubusercontent.com/40122521/175040181-9ef9d718-b5c2-4090-b9a5-97dadeaa197e.jpeg)
+ 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
@@ -13,8 +11,6 @@ In the app, a user can create, and view trips.
 Frontend Repo: https://github.com/liornoy/GroupDrive
 
 ### Built With
-
-This section should list any major frameworks/libraries used to bootstrap your project. Leave any add-ons/plugins for the acknowledgements section. Here are a few examples.
 
 * [Flask](https://flask.palletsprojects.com/en/2.1.x/)
 * [MongoDB](https://www.mongodb.com/)
