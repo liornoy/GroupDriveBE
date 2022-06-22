@@ -10,14 +10,13 @@ from resources.errors import (
     InternalServerError,
 )
 from datetime import datetime as dt
-from uuid import uuid4
 import uuid
 class TripApi(Resource):
     def get(self, tripId):
         try:
             trip = Trip.objects().get(_id=tripId)
             # Updating the field isTripToday
-            trip.updateTrip()
+            trip.update_trip()
             return Response(trip.to_json(), mimetype="application/json", status=200)
         except DoesNotExist:
             raise TripNotExistsError
@@ -34,7 +33,7 @@ class TripApi(Resource):
         if trip.creator != user:
             raise UnauthorizedError
         trip.update(**body)
-        trip.updateTrip()
+        trip.update_trip()
         return Response(status=200)
 
     def delete(self, tripId):
@@ -66,7 +65,7 @@ class TripsApi(Resource):
                 print("creatore_filter header: ",creator_filter)
                 if trip.creator != creator_filter:
                     continue
-            trip.updateTrip()
+            trip.update_trip()
             trip_dict = trip.to_mongo().to_dict()
             trip_dict['date'] = trip.date.isoformat()
             tripsList.append(trip_dict)
@@ -90,7 +89,7 @@ class GetCoordinatesAPI(Resource):
         except DoesNotExist:
             raise TripNotExistsError
 
-        coordinates = trip.getParticipantsCoordinates()
+        coordinates = trip.get_participants_coordinates()
         return Response(coordinates, mimetype="application/json", status=200)
 
 
@@ -106,7 +105,7 @@ class UpdateCoordinatesAPI(Resource):
         body["user"] = user
         body["tripID"] = tripId
         newCoordinates = UserLiveGPSCoordinates(**body)
-        if newCoordinates.isValid() is not True:
+        if newCoordinates.is_valid() is not True:
             raise InternalServerError
 
         # if user allready has coordinates in the database update it
@@ -135,5 +134,5 @@ class JoinTripApi(Resource):
             raise TripNotExistsError
 
         
-        trip.addUser(user)
+        trip.add_user(user)
         return Response(status=200)
