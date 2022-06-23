@@ -56,7 +56,7 @@ class TripApi(Resource):
 
 class TripsApi(Resource):
     def get(self):
-        trips = Trip.objects()
+        trips = Trip.objects().order_by('date')
         tripsList = []
         creator_filter = request.headers.get("creator")
             
