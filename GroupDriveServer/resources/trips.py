@@ -42,6 +42,11 @@ class TripApi(Resource):
 
         except DoesNotExist:
             raise TripNotExistsError
+
+        user = request.headers.get("username")
+        if (user != trip.creator):
+            return UnauthorizedError
+
         # Deleting all existing coordinates for this trip from the database.
         try:
             coordinates = UserLiveGPSCoordinates.objects().filter(tripID=tripId)
