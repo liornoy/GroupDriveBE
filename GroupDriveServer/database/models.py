@@ -47,6 +47,9 @@ class Trip(Document):
             self.save()
         else: 
             self.participants.remove(str(username))
+            coors = UserLiveGPSCoordinates.objects(tripID = self._id, user = str(username))
+            if coors:
+                coors.delete()
             self.save()
 
     def get_participants_coordinates(self):
