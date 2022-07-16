@@ -6,11 +6,10 @@ services:
       dockerfile: Dockerfile
     container_name: flask
     image: groupdrive-server
-    ports:
-      - 5000:5000
     restart: unless-stopped
     depends_on:
       - mongodb
+    network_mode: host
   mongodb:
     image: mongo
     container_name: mongodb
