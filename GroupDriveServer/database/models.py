@@ -5,9 +5,9 @@ from mongoengine.fields import (
     FloatField,
     DateField,
     BooleanField,
+    IntField,
 )
 from datetime import datetime as dt
-from mongoengine.errors import DoesNotExist
 from bson.json_util import dumps
 
 
@@ -27,12 +27,18 @@ class Trip(Document):
     participants = ListField(StringField())
     date = DateField(required=True, default=dt.today)
     isTripToday = BooleanField(default=False)
+    maxGroupSize = IntField(default = -1)
+    tripFull = BooleanField(default=False)
 
     def update_trip(self):
         if self.date == dt.today().date():
             self.isTripToday = True
         else:
             self.isTripToday = False
+        if len(self.participants) == self.maxGroupSize:
+            self.tripFull = True
+        else:
+            self.tripFull = False
         self.save()
 
     def is_user_joined(self, creator):
@@ -42,7 +48,7 @@ class Trip(Document):
         return False
 
     def add_user(self, username):
-        if self.is_user_joined(username) == False:
+        if self.is_user_joined(username) == False and not self.tripFull:
             self.participants.append(str(username))
             self.save()
         else: 
@@ -50,6 +56,8 @@ class Trip(Document):
             coors = UserLiveGPSCoordinates.objects(tripID = self._id, user = str(username))
             if coors:
                 coors.delete()
+            if self.tripFull:
+                self.tripFull = False
             self.save()
 
     def get_participants_coordinates(self):
