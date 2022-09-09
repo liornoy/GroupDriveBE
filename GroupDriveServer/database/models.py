@@ -10,7 +10,6 @@ from mongoengine.fields import (
 )
 from datetime import datetime as dt
 from bson.json_util import dumps
-import time
 
 
 class User(Document):
@@ -90,4 +89,4 @@ class UserLiveGPSCoordinates(Document):
 class LiveMessages(Document):
     tripID = StringField(required=True)
     message = StringField(required=True)
-    timeStamp = IntField(required=True, default=time.time())
+    timeStamp = IntField(required=True)

@@ -145,15 +145,15 @@ class JoinTripApi(Resource):
 
 class PostMessageAPI(Resource):
      def post(self, tripId):
-         #try:
-         #    trip = Trip.objects().get(_id=tripId)
-         #except DoesNotExist:
-         #    raise TripNotExistsError
+         try:
+             trip = Trip.objects().get(_id=tripId)
+         except DoesNotExist:
+             raise TripNotExistsError
 
          body = request.get_json(force=True)
          print("the recieved live message is:")
          print (body)
-         message = LiveMessages(tripID=tripId, message=body['message']).save()
+         LiveMessages(tripID=tripId, message=body['message'], timeStamp=time.time()).save()
 
      def get(self, tripId):
          try:
