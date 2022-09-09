@@ -5,6 +5,7 @@ from .trips import (
     JoinTripApi,
     UpdateCoordinatesAPI,
     GetCoordinatesAPI,
+    PostMessageAPI,
 )
 
 
@@ -17,6 +18,7 @@ def initialize_routes(api):
     api.add_resource(SignUp, "/api/users/sign-up/<username>/<password>")
     #api.add_resource(Userget, "/api/users/<userID>")
 
+
     # Trips API
 
     api.add_resource(TripsApi, "/api/trips")
@@ -24,3 +26,4 @@ def initialize_routes(api):
     api.add_resource(JoinTripApi, "/api/trips/<tripId>/join")
     api.add_resource(UpdateCoordinatesAPI, "/api/trips/<tripId>/update-coordinates")
     api.add_resource(GetCoordinatesAPI, "/api/trips/<tripId>/get-coordinates")
+    api.add_resource(PostMessageAPI, "/api/trips/<tripId>/live-messages")

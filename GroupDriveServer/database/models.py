@@ -6,9 +6,11 @@ from mongoengine.fields import (
     DateField,
     BooleanField,
     IntField,
+    DateTimeField,
 )
 from datetime import datetime as dt
 from bson.json_util import dumps
+import time
 
 
 class User(Document):
@@ -84,3 +86,8 @@ class UserLiveGPSCoordinates(Document):
         joinedTrip = trip.is_user_joined(self.user)
         isTripToday = trip.isTripToday
         return joinedTrip and isTripToday
+
+class LiveMessages(Document):
+    tripID = StringField(required=True)
+    message = StringField(required=True)
+    timeStamp = IntField(required=True, default=time.time())

@@ -1,7 +1,7 @@
 from flask_restful import Resource
 from flask import Response, request
 from bson.json_util import dumps
-from database.models import Trip, User, UserLiveGPSCoordinates
+from database.models import Trip, User, UserLiveGPSCoordinates, LiveMessages
 from mongoengine.errors import DoesNotExist
 from resources.errors import (
     TripNotExistsError,
@@ -11,6 +11,8 @@ from resources.errors import (
 )
 from datetime import datetime as dt
 import uuid
+import time
+
 class TripApi(Resource):
     def get(self, tripId):
         try:
@@ -137,7 +139,32 @@ class JoinTripApi(Resource):
             trip = Trip.objects().get(_id=tripId)
         except DoesNotExist:
             raise TripNotExistsError
-
-        
         trip.add_user(user)
         return Response(status=200)
+
+
+class PostMessageAPI(Resource):
+     def post(self, tripId):
+         #try:
+         #    trip = Trip.objects().get(_id=tripId)
+         #except DoesNotExist:
+         #    raise TripNotExistsError
+
+         body = request.get_json(force=True)
+         print("the recieved live message is:")
+         print (body)
+         message = LiveMessages(tripID=tripId, message=body['message']).save()
+
+     def get(self, tripId):
+         try:
+             messages = LiveMessages.objects(tripID=tripId)
+         except DoesNotExist:
+             raise TripNotExistsError
+         #print("sending these live messages as a response:")
+         #print(messages)
+         list = []
+         for message in messages:
+             dict = message.to_mongo().to_dict()
+             list.append(dict)
+         coors_json = dumps(list)
+         return Response(coors_json, mimetype="application/json", status=200)
