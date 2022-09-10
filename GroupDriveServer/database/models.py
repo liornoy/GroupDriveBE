@@ -69,7 +69,6 @@ class Trip(Document):
             c_list.append(c_dict)
         coors_json=dumps(c_list)
         return coors_json
-  
 
 
 class UserLiveGPSCoordinates(Document):
@@ -86,7 +85,7 @@ class UserLiveGPSCoordinates(Document):
         isTripToday = trip.isTripToday
         return joinedTrip and isTripToday
 
-class LiveMessages(Document):
+class LiveMessage(Document):
     tripID = StringField(required=True)
     message = StringField(required=True)
     timeStamp = IntField(required=True)

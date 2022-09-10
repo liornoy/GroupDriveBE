@@ -1,7 +1,7 @@
 from flask_restful import Resource
 from flask import Response, request
 from bson.json_util import dumps
-from database.models import Trip, User, UserLiveGPSCoordinates, LiveMessages
+from database.models import Trip, User, UserLiveGPSCoordinates, LiveMessage
 from mongoengine.errors import DoesNotExist
 from resources.errors import (
     TripNotExistsError,
@@ -145,26 +145,34 @@ class JoinTripApi(Resource):
 
 class PostMessageAPI(Resource):
      def post(self, tripId):
-         try:
-             trip = Trip.objects().get(_id=tripId)
-         except DoesNotExist:
-             raise TripNotExistsError
+         #try:
+         #    trip = Trip.objects().get(_id=tripId)
+         #except DoesNotExist:
+         #    raise TripNotExistsError
 
          body = request.get_json(force=True)
          print("the recieved live message is:")
          print (body)
-         LiveMessages(tripID=tripId, message=body['message'], timeStamp=time.time()).save()
+         LiveMessage(tripID=tripId, message=body['message'], timeStamp=time.time()).save()
 
      def get(self, tripId):
          try:
-             messages = LiveMessages.objects(tripID=tripId)
+             messages = LiveMessage.objects(tripID=tripId)
          except DoesNotExist:
              raise TripNotExistsError
          #print("sending these live messages as a response:")
          #print(messages)
          list = []
+         latestMessage = messages[0];
          for message in messages:
-             dict = message.to_mongo().to_dict()
-             list.append(dict)
-         coors_json = dumps(list)
-         return Response(coors_json, mimetype="application/json", status=200)
+             if message.timeStamp >= latestMessage.timeStamp:
+                 latestMessage = message;
+             #dict = message.to_mongo().to_dict()
+             #list.append(dict)
+         print("the latest message is:")
+         print(latestMessage.message)
+         print(latestMessage.tripID)
+         print(latestMessage.timeStamp)
+         #messageJson = dumps(latestMessage)
+         messageDict = latestMessage.to_mongo().to_dict()
+         return Response(dumps(messageDict), mimetype="application/json", status=200)
